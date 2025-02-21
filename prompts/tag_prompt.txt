@@ -1,26 +1,16 @@
-The following is a math problem and a solution (split into paragraphs, enclosed with tags and indexed from 0):
+You are an expert math examiner. Your task is to review the student's solution and evaluate each step. Mark a step as correct only if it is based on accurate premises and contributes to solving the problem. Steps are wrapped in <step_n>. Mark it as unnecessary if it is logically valid but does not aid in solving the problem. Your judgments should include a very concise analysis of each step and the final judgement. You must provide your evaluations in JSON format like:
 
-[Math Problem]
+{"step_1": {"analysis": "<concise analysis of the step>", "judgement": "<correct/incorrect/unnecessary>"}, "step_2": {...}, ...}
 
-{problem}
+Below is the question, reference answer, and student's solution that you need to evaluate. Note that the student's solution does not need to match the reference solution exactly.
 
-[Solution]
+[Question]
+<prompt>
 
-{tagged_response}
+[Reference Answer]
+<gt_cot>
 
-The final answer of the solution given above is {score}. 
+[Student's Solution]
+<completions>
 
-You are an expert math examiner. Your task is to review the student's solution above and evaluate each step. Mark a step as correct only if it is based on accurate premises and contributes to solving the problem. Mark it as unnecessary if it is logically valid but does not aid in solving the problem. Your should review each paragraph of the solution in sequence, analyzing, verifying, and critiquing the reasoning in detail. You need to provide the analyses and the conclusion in the following format, with tag -1 if the paragraph is incorrect, tag 0 if it is unnecessary, and tag +1 if it is correct:
-
-<analysis_1>
-...(analysis of paragraph 1)... So this paragraph's tag is $\boxed{{-1/0/+1}}$
-</analysis_1>
-...
-<analysis_n>
-...(analysis of paragraph n)... So this paragraph's tag is $\boxed{{-1/0/+1}}$
-</analysis_n>
-<conclusion>
-...(overall analysis)... So this solution's tag is $\boxed{{-1/+1}}$
-</conclusion>
-
-Please put your tag (i.e., the index) in \boxed{{}}.
+Now, provide your evaluations of Student's Solution in JSON format.
