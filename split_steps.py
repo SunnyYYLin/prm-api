@@ -8,14 +8,11 @@ import random
 from pathlib import Path
 from utils import query_llm, sort_dict, reduce_newlines
 
-NUM_PROCESSES = 1
 USER_TEMPLATE = "<problem>{problem}<\\problem>\n<solution>{solution}<\\solution>"
 
 with open('api_key.txt', 'r') as f:
-    api_key = f.readlines()[2].strip()
+    api_key = f.readlines()[0].strip()
 
-# client = OpenAI(api_key=api_key, base_url="https://api.deepseek.com")
-# client = OpenAI(api_key=api_key, base_url="https://dashscope.aliyuncs.com/compatible-mode/v1")
 client = OpenAI(api_key=api_key, base_url="https://zzzzapi.com/v1")
     
 def preprocess(dataset: list[dict], name: str) -> list[dict]:
@@ -61,11 +58,18 @@ def _preprocess_metamath(dataset: list[dict]) -> list[dict]:
     return dataset
 
 if __name__ == '__main__': 
-    dataset_name = 'metamath'
-    input_path = Path('./data/MetaMathQA/MetaMathQA-395K.jsonl')
+    import argparse
+    parser = argparse.ArgumentParser(description='Tag Math Critiques')
+    parser.add_argument('--input_path', type=str, help='Path to the input file', \
+        default="/home/sunnylin/projects/prm-api/data/math_false.jsonl")
+    parser.add_argument('--dataset_name', type=str, help='Name of the dataset', default='math')
+    parser.add_argument('--num_processes', type=int, default=128, help='Number of processes to use')
+    args = parser.parse_args()
+    
+    input_path = Path(args.input_path)
     with open(input_path, 'r') as f:
         dataset = [json.loads(line) for line in f]
-        dataset = preprocess(dataset, dataset_name)
+        dataset = preprocess(dataset, args.dataset_name)
     
     with open('./prompts/split_prompt.txt', 'r') as f:
         role_prompt = f.read()
@@ -93,7 +97,7 @@ if __name__ == '__main__':
         datum['steps'] = steps
         return datum
     
-    with Pool(NUM_PROCESSES) as p:
+    with Pool(args.num_processes) as p:
         for datum in tqdm(p.imap(single_process, dataset), total=len(dataset), 
                            desc='Querying LLM', dynamic_ncols=True):
             if datum.get('steps') is not None:
