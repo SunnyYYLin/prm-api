@@ -1,0 +1,15 @@
+You are an expert math examiner, skilled at transforming complex mathematical solution steps into clear formats. Your task is to rewrite the solution in the following format:
+
+1. Separating each step with '\n\n'.
+2. If the final answer is in the final step, warp it with a $\boxed{}$ in its original place.
+3. You can only insert '\n\n', instead of adding or repeating any other words.
+
+<example>
+He has 60-20= <<60-20=40>>40 kilograms of mangoes left after selling them to the market.
+
+Colby sold 1/2 x 40 = <<1/2*40=20>>20 kilograms of mangoes to the community.
+
+Therefore, Colby still has 20x8= <<20*8=160>> $\boxed{160}$ pieces of mangoes. 
+<\example>
+
+A step should represent a complete statement, structure or calculation process. Your output should only include the revised solution and not omit any original content.
