@@ -6,14 +6,11 @@ from pathlib import Path
 from utils import query_llm, brief_info
 import re
 
-NUM_PROCESSES = 128
 SYSTEM_PROMPT = "You are a helpful assistant"
 
 with open('api_key.txt', 'r') as f:
     api_key = f.readlines()[0].strip()
 
-# client = OpenAI(api_key=api_key, base_url="https://api.deepseek.com")
-# client = OpenAI(api_key=api_key, base_url="https://dashscope.aliyuncs.com/compatible-mode/v1")
 client = OpenAI(api_key=api_key, base_url="https://zzzzapi.com/v1")
 
 def preprocess(data: list[dict[str, ]]):
@@ -24,7 +21,6 @@ def preprocess(data: list[dict[str, ]]):
         del(datum['query'])
         del(datum['gt'])
         del(datum['token_length'])
-        del(datum['vr_score'])
         del(datum['response'])
     return data
 
@@ -38,7 +34,7 @@ def construct_critique_prompt(result: dict, template: str):
     return critique
 
 def extract_critique(critique: str):
-    critique = critique.removeprefix('```json').removesuffix('```')
+    critique = critique.removeprefix('```json').removesuffix('```') # Remove code block
     critique = re.sub(r'\\(?![\\/bfnrt])', r'\\\\', critique)
     critique = json.loads(critique)
     labels: list[int] = []
@@ -52,7 +48,14 @@ def extract_critique(critique: str):
     return labels
 
 if __name__ == '__main__': 
-    input_path = Path('data/math.jsonl')
+    import argparse
+    parser = argparse.ArgumentParser(description='Tag Math Critiques')
+    parser.add_argument('--input_path', type=str, help='Path to the input file', \
+        default="/home/sunnylin/projects/prm-api/data/math_false.jsonl")
+    parser.add_argument('--num_processes', type=int, default=128, help='Number of processes to use')
+    args = parser.parse_args()
+    
+    input_path = Path(args.input_path)
     with open(input_path, 'r') as f:
         results = [json.loads(line) for line in f]
         print(brief_info(results))
@@ -89,7 +92,7 @@ if __name__ == '__main__':
             result['labels'] = labels
             return result
     
-        with Pool(NUM_PROCESSES) as p:
+        with Pool(args.num_processes) as p:
             for result in tqdm(p.imap(single_process, results), total=len(results), 
                             desc='Tagging Process Rewards', dynamic_ncols=True):
                 if result.get('labels') is not None:
