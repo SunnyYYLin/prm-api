@@ -20,7 +20,6 @@ def preprocess(data: list[dict[str, ]]):
     for i, datum in enumerate(data):
         datum['index'] = i
         datum['prompt'] = datum['query']
-        datum['response'] = datum['response'].replace('Step', '\nStep')
         datum['completions'] = datum['response'].split('\n\n')
         del(datum['query'])
         del(datum['gt'])
