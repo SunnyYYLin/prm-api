@@ -2,7 +2,7 @@ import json
 from utils import sort_dict
 from utils import brief_info
 
-path = "/home/sunnylin/projects/prm-api/data/math-DPO-001-PRM-filter-epo0_hacking.jsonl"
+path = "/home/sunnylin/projects/prm-api/data/gsm8k-DPO-001-PRM-filter-epo0_hacking.jsonl"
 with open(path, 'r+') as f:
     results = [json.loads(line) for line in f.readlines()]
     print(brief_info(results))

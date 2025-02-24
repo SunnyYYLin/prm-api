@@ -9,7 +9,7 @@ import re
 SYSTEM_PROMPT = "You are a helpful assistant"
 
 with open('api_key.txt', 'r') as f:
-    api_key = f.readlines()[1].strip()
+    api_key = f.readlines()[0].strip()
 
 client = OpenAI(api_key=api_key, base_url="https://zzzzapi.com/v1")
 
@@ -36,11 +36,7 @@ def construct_critique_prompt(result: dict, template: str):
 def extract_critique(critique: str):
     critique = critique.removeprefix('```json').removesuffix('```') # Remove code block
     critique = re.sub(r'\\(?![\\/bfnrt])', r'\\\\', critique)
-    try:
-        critique = json.loads(critique)
-    except json.JSONDecodeError:
-        print(critique)
-        return
+    critique = json.loads(critique)
     labels: list[int] = []
     analysis = []
     for v in critique.values():
@@ -57,7 +53,7 @@ if __name__ == '__main__':
     import argparse
     parser = argparse.ArgumentParser(description='Tag Math Critiques')
     parser.add_argument('--input_path', type=str, help='Path to the input file', \
-        default="/home/sunnylin/projects/prm-api/data/math-PRM-filter-epo0_hacking.jsonl")
+        default="/home/sunnylin/projects/prm-api/data/gsm8k-DPO-001-PRM-filter-epo0_hacking.jsonl")
     parser.add_argument('--num_processes', type=int, default=128, help='Number of processes to use')
     args = parser.parse_args()
     
