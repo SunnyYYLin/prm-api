@@ -2,23 +2,12 @@ import json
 from utils import sort_dict
 from utils import brief_info
 
-path = "/home/sunnylin/projects/prm-api/data/math_VRs_rm.jsonl"
-
-path = "/home/sunnylin/projects/prm-api/data/math_false_critiques.jsonl"
+path = "/home/sunnylin/projects/prm-api/data/gsm8k_VRs_rm.jsonl"
 with open(path, 'r+') as f:
-with open(path, 'r') as f:
-    results = [json.loads(line) for line in f]
-    f.seek(0)
-    for result in results:
-        result['vr_score'] = 1
-        sort_dict(result, 'index', 'prompt', 'completions', 'labels', 'vr_score')
-        f.write(json.dumps(result) + '\n')
-    f.truncate()
-        
-    
+    results = [json.loads(line) for line in f.readlines()]
     print(brief_info(results))
 
-f = open('special.txt', 'w')
+f = open('data/special.txt', 'w')
 count = 0
 for result in results:
     steps = result['response'].split('\n\n')

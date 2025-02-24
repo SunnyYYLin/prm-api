@@ -36,8 +36,13 @@ def construct_critique_prompt(result: dict, template: str):
 def extract_critique(critique: str):
     critique = critique.removeprefix('```json').removesuffix('```') # Remove code block
     critique = re.sub(r'\\(?![\\/bfnrt])', r'\\\\', critique)
-    critique = json.loads(critique)
+    try:
+        critique = json.loads(critique)
+    except json.JSONDecodeError:
+        print(critique)
+        return
     labels: list[int] = []
+    analysis = []
     for v in critique.values():
         if v['judgement'] == 'correct':
             labels.append(1)
@@ -45,13 +50,14 @@ def extract_critique(critique: str):
             labels.append(-1)
         else:
             labels.append(0)
-    return labels
+        analysis.append(v['analysis'])
+    return labels, analysis
 
 if __name__ == '__main__': 
     import argparse
     parser = argparse.ArgumentParser(description='Tag Math Critiques')
     parser.add_argument('--input_path', type=str, help='Path to the input file', \
-        default="/home/sunnylin/projects/prm-api/data/math_false.jsonl")
+        default="/home/sunnylin/projects/prm-api/data/gsm8k_VRs_rm.jsonl")
     parser.add_argument('--num_processes', type=int, default=128, help='Number of processes to use')
     args = parser.parse_args()
     
@@ -80,7 +86,7 @@ if __name__ == '__main__':
             # print(user_prompt)
             try:
                 critique = query_llm(SYSTEM_PROMPT, user_prompt, client)
-                labels = extract_critique(critique)
+                labels, analysis = extract_critique(critique)
                 assert len(labels) == len(result['completions']), \
                     f"Length Mismatch: {len(labels)} vs {len(result['completions'])}"
             except Exception as e:
@@ -90,6 +96,7 @@ if __name__ == '__main__':
                     # print(critique)
                 return result
             result['labels'] = labels
+            result['analysis'] = analysis
             return result
     
         with Pool(args.num_processes) as p:
