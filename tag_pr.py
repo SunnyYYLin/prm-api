@@ -9,18 +9,18 @@ import re
 SYSTEM_PROMPT = "You are a helpful assistant"
 
 with open('api_key.txt', 'r') as f:
-    api_key = f.readlines()[0].strip()
+    api_key = f.readlines()[1].strip()
 
 client = OpenAI(api_key=api_key, base_url="https://zzzzapi.com/v1")
 
 def preprocess(data: list[dict[str, ]]):
     for i, datum in enumerate(data):
-        datum['index'] = i
+        datum['index'] = datum['idx']
         datum['prompt'] = datum['query']
         datum['completions'] = datum['response'].split('\n\n')
         del(datum['query'])
-        del(datum['gt'])
-        del(datum['token_length'])
+        del(datum['idx'])
+        del(datum['min_reward'])
         del(datum['response'])
     return data
 
@@ -57,7 +57,7 @@ if __name__ == '__main__':
     import argparse
     parser = argparse.ArgumentParser(description='Tag Math Critiques')
     parser.add_argument('--input_path', type=str, help='Path to the input file', \
-        default="/home/sunnylin/projects/prm-api/data/gsm8k_VRs_rm.jsonl")
+        default="/home/sunnylin/projects/prm-api/data/math-PRM-filter-epo0_hacking.jsonl")
     parser.add_argument('--num_processes', type=int, default=128, help='Number of processes to use')
     args = parser.parse_args()
     
