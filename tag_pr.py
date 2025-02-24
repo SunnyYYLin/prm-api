@@ -28,7 +28,7 @@ def construct_critique_prompt(result: dict, template: str):
     critique = template.replace('<gt_cot>', result['gt_cot'])
     completions = ''
     for i, completion in enumerate(result['completions']):
-        completions += f"<step_{i+1}>\n{completion}\n<\\step_{i+1}>\n"
+        completions += f"<step_{i+1}>\n{completion}\n<\\step_{i+1}>\n\n"
     critique = critique.replace('<completions>', completions)
     critique = critique.replace('<prompt>', result['prompt'])
     return critique
